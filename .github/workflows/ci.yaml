@@ -1,12 +1,13 @@
-
 name: Cypress Tests
 
 on: push
 
 jobs:
-  cypress-run-chrome:
+  cypress-tests:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        browser: [chrome, firefox, edge]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -14,92 +15,23 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Cypress Tests Chrome
+      - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
-          browser: chrome
-      - uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v6
-# after the test run completes store videos and any screenshots
+          browser: ${{ matrix.browser }}
+
       - uses: actions/upload-artifact@v4
-       # add the line below to store screenshots only on failures
-       # if: failure()
+        if: always()
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-${{ matrix.browser }}
           path: cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+          if-no-files-found: ignore
           retention-days: 1
+
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: cypress-videos
+          name: cypress-videos-${{ matrix.browser }}
           path: cypress/videos
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+          if-no-files-found: ignore
           retention-days: 1
-
-
-  cypress-run-firefox:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Cypress Tests Chrome
-        uses: cypress-io/github-action@v6
-        with:
-          browser: firefox
-      - uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v6
-      # after the test run completes store videos and any screenshots
-      - uses: actions/upload-artifact@v4
-        # add the line below to store screenshots only on failures
-        # if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-          retention-days: 1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-          retention-days: 1
-
-
-  cypress-run-edge:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Cypress Tests Chrome
-        uses: cypress-io/github-action@v6
-        with:
-          browser: edge
-      - uses: actions/checkout@v4
-      - uses: cypress-io/github-action@v6
-      # after the test run completes store videos and any screenshots
-      - uses: actions/upload-artifact@v4
-        # add the line below to store screenshots only on failures
-        # if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-          retention-days: 1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
-          retention-days: 1
-
-
