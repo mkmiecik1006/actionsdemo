@@ -8,23 +8,32 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
       - name: Install Dependencies
         run: npm install
-
+      - name: Save node_modules folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: node_modules
+          if-no-files-found: error
+          path: node_modules
 
   cypress-tests:
+    needs: install
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser: [ chrome, firefox, edge ]
+        browser: [chrome, firefox, edge]
     steps:
-
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Download node_modules folder
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
           browser: ${{ matrix.browser }}
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -32,7 +41,6 @@ jobs:
           path: cypress/screenshots
           if-no-files-found: ignore
           retention-days: 1
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
