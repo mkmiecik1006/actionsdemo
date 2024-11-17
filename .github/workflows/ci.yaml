@@ -1,9 +1,6 @@
 name: Cypress Tests
 
-on:
-  push:
-      branches:
-        - master
+on: push
 
 jobs:
   install:
@@ -11,6 +8,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Install Dependencies
         run: npm install
       - name: Save node_modules folder
@@ -65,13 +66,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 1
       - name: Load test report history
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: always()
         continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
-
       - name: Build test report
         uses: simple-elf/allure-report-action@v1.7
         if: always()
@@ -79,7 +79,6 @@ jobs:
           gh_pages: gh-pages
           allure_history: allure-history
           allure_results: allure-results
-# report
       - name: Publish test report
         uses: peaceiris/actions-gh-pages@v3
         if: always()
